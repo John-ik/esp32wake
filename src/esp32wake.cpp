@@ -1,5 +1,6 @@
 #include <string.h>
 #include "esp32wake.hpp"
+#include "wake_protocol.h"
 
 
 ESP32Wake::ESP32Wake(uart_port_t uart_prt) : uart{uart_prt} {}
@@ -29,20 +30,20 @@ void ESP32Wake::begin(gpio_num_t tx_pin, gpio_num_t rx_pin) {
 }
 
 wake_status_t ESP32Wake::send_package(wake_package_info_t *p_pckg) {
+    static uint8_t buffer[WAKE_MAX_PACKAGE_LEN] = {};
+    
     uint16_t total;
     wake_status_t ret;
-    uint8_t *p_bytes;
 
     p_pckg->crc = wake_calculate_package_crc(p_pckg, ignore_address_flg);
-    p_bytes = new uint8_t[WAKE_MAX_PACKAGE_LEN];
-    ret = wake_package_to_bytes(p_pckg, ignore_address_flg, p_bytes, &total);
+    ret = wake_package_to_bytes(p_pckg, ignore_address_flg, buffer, &total);
     if (ret != WAKE_OK) {
-        delete[] p_bytes;
+        memset(buffer, 0, total < WAKE_MAX_PACKAGE_LEN ? total : WAKE_MAX_PACKAGE_LEN);
         return ret;
     }
-    uart_write_bytes(uart, p_bytes, total);
+    uart_write_bytes(uart, buffer, total);
 
-    delete[] p_bytes;
+    memset(buffer, 0, total < WAKE_MAX_PACKAGE_LEN ? total : WAKE_MAX_PACKAGE_LEN);
     return WAKE_OK;
 }
 
