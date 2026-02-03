@@ -66,6 +66,7 @@ class ESP32Wake {
          * @param p_pckg Pointer to the package structure (out)
          * @return Received bytes count, or -1 in error case, -2 if crc check is failed
          */
+         [[deprecated("May lose package")]]
         len_t catch_input_package(wake_package_info_t *p_pckg);
 
         /**
@@ -90,6 +91,9 @@ class ESP32Wake {
          * @brief Getting the address ignoring flag value
          */
         bool get_ignore_address_flag(void);
+
+        /// @brief Getting uart
+        uart_port_t get_uart_port(void) const;
 
     protected:
         uart_port_t uart;

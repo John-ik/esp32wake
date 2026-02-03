@@ -163,3 +163,5 @@ bool ESP32Wake::parse_byte(wake_package_info_t *p_pckg, uint8_t &byte, esp32wake
 void ESP32Wake::set_ignore_address_flag(bool flag) {ignore_address_flg = flag;}
 
 bool ESP32Wake::get_ignore_address_flag(void) {return ignore_address_flg;}
+
+uart_port_t ESP32Wake::get_uart_port(void) const { return uart; }
